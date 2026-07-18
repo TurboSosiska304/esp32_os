@@ -1,80 +1,33 @@
 #include "terminal_service.h"
 
 #include <stdio.h>
-#include <string.h>
 
-#include "esp_heap_caps.h"
 #include "esp_log.h"
-#include "esp_system.h"
-#include "network_service.h"
+#include "shell.h"
 
 #define TERMINAL_LINE_LENGTH 96
-#define MICRO_OS_MAX_TASKS 12
 
 static const char *const TAG = "terminal";
 
-static void terminal_show_status(void)
+static void terminal_write(void *context, const char *text)
 {
-    char ip_address[16];
-    network_service_get_ip(ip_address, sizeof(ip_address));
-    printf("Micro-OS %s\r\n", MICRO_OS_VERSION);
-    printf("uptime: %llu ms\r\n", (unsigned long long)micro_os_uptime_ms());
-    printf("heap free: %lu bytes\r\n", (unsigned long)heap_caps_get_free_size(MALLOC_CAP_8BIT));
-    printf("wifi: %s, ip: %s\r\n", network_service_is_connected() ? "connected" : "offline", ip_address);
-}
-
-static void terminal_show_tasks(void)
-{
-    printf("id  priority  stack-free  name\r\n");
-    for (micro_os_task_id_t task_id = 1; task_id <= MICRO_OS_MAX_TASKS; ++task_id) {
-        micro_os_task_info_t info;
-        if (micro_os_task_get_info(task_id, &info) == MICRO_OS_OK) {
-            printf("%u   %u         %lu          %s\r\n", (unsigned)info.id, (unsigned)info.priority,
-                   (unsigned long)info.stack_free_bytes, info.name);
-        }
-    }
-}
-
-static void terminal_execute(char *line)
-{
-    const char *delimiter = " \t\r\n";
-    char *context;
-    char *command = strtok_r(line, delimiter, &context);
-    if (command == NULL) {
-        return;
-    }
-    if (strcmp(command, "help") == 0) {
-        printf("commands: help status tasks ip clear reboot\r\n");
-    } else if (strcmp(command, "status") == 0) {
-        terminal_show_status();
-    } else if (strcmp(command, "tasks") == 0) {
-        terminal_show_tasks();
-    } else if (strcmp(command, "ip") == 0) {
-        char ip_address[16];
-        network_service_get_ip(ip_address, sizeof(ip_address));
-        printf("%s\r\n", ip_address);
-    } else if (strcmp(command, "clear") == 0) {
-        printf("\033[2J\033[H");
-    } else if (strcmp(command, "reboot") == 0) {
-        printf("Restarting...\r\n");
-        esp_restart();
-    } else {
-        printf("unknown command: %s\r\n", command);
-    }
+    (void)context;
+    fputs(text, stdout);
+    fflush(stdout);
 }
 
 static void terminal_task(void *argument)
 {
     (void)argument;
     char line[TERMINAL_LINE_LENGTH];
+    const shell_session_t session = {.write = terminal_write, .context = NULL};
 
-    printf("\r\nMicro-OS terminal\r\nType 'help' for commands.\r\nmos> ");
-    fflush(stdout);
+    shell_print_banner(&session);
+    terminal_write(NULL, "mos> ");
     for (;;) {
         if (fgets(line, sizeof(line), stdin) != NULL) {
-            terminal_execute(line);
-            printf("mos> ");
-            fflush(stdout);
+            shell_execute_line(&session, line);
+            terminal_write(NULL, "mos> ");
         }
         micro_os_sleep_ms(10);
     }

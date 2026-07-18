@@ -116,6 +116,7 @@ micro_os_status_t micro_os_task_get_info(micro_os_task_id_t task_id, micro_os_ta
             info->name = s_tasks[index].name;
             info->priority = s_tasks[index].priority;
             info->stack_free_bytes = uxTaskGetStackHighWaterMark(s_tasks[index].handle) * sizeof(StackType_t);
+            info->suspended = eTaskGetState(s_tasks[index].handle) == eSuspended;
             taskEXIT_CRITICAL(&s_task_lock);
             return MICRO_OS_OK;
         }
@@ -123,6 +124,83 @@ micro_os_status_t micro_os_task_get_info(micro_os_task_id_t task_id, micro_os_ta
     taskEXIT_CRITICAL(&s_task_lock);
 
     return MICRO_OS_ERROR_INVALID_ARGUMENT;
+}
+
+static os_task_record_t *micro_os_find_task(micro_os_task_id_t task_id)
+{
+    for (size_t index = 0; index < OS_MAX_TASKS; ++index) {
+        if (s_tasks[index].in_use && s_tasks[index].id == task_id) {
+            return &s_tasks[index];
+        }
+    }
+    return NULL;
+}
+
+micro_os_status_t micro_os_task_set_priority(micro_os_task_id_t task_id, uint8_t priority)
+{
+    if (!s_initialized || priority >= configMAX_PRIORITIES) {
+        return MICRO_OS_ERROR_INVALID_ARGUMENT;
+    }
+
+    taskENTER_CRITICAL(&s_task_lock);
+    os_task_record_t *task = micro_os_find_task(task_id);
+    if (task != NULL) {
+        task->priority = priority;
+        vTaskPrioritySet(task->handle, priority);
+    }
+    taskEXIT_CRITICAL(&s_task_lock);
+    return task == NULL ? MICRO_OS_ERROR_INVALID_ARGUMENT : MICRO_OS_OK;
+}
+
+micro_os_status_t micro_os_task_suspend(micro_os_task_id_t task_id)
+{
+    if (!s_initialized) {
+        return MICRO_OS_ERROR_STATE;
+    }
+
+    taskENTER_CRITICAL(&s_task_lock);
+    os_task_record_t *task = micro_os_find_task(task_id);
+    if (task != NULL) {
+        vTaskSuspend(task->handle);
+    }
+    taskEXIT_CRITICAL(&s_task_lock);
+    return task == NULL ? MICRO_OS_ERROR_INVALID_ARGUMENT : MICRO_OS_OK;
+}
+
+micro_os_status_t micro_os_task_resume(micro_os_task_id_t task_id)
+{
+    if (!s_initialized) {
+        return MICRO_OS_ERROR_STATE;
+    }
+
+    taskENTER_CRITICAL(&s_task_lock);
+    os_task_record_t *task = micro_os_find_task(task_id);
+    if (task != NULL) {
+        vTaskResume(task->handle);
+    }
+    taskEXIT_CRITICAL(&s_task_lock);
+    return task == NULL ? MICRO_OS_ERROR_INVALID_ARGUMENT : MICRO_OS_OK;
+}
+
+micro_os_status_t micro_os_get_system_info(micro_os_system_info_t *info)
+{
+    if (!s_initialized || info == NULL) {
+        return MICRO_OS_ERROR_INVALID_ARGUMENT;
+    }
+
+    uint16_t task_count = 0;
+    taskENTER_CRITICAL(&s_task_lock);
+    for (size_t index = 0; index < OS_MAX_TASKS; ++index) {
+        if (s_tasks[index].in_use) {
+            ++task_count;
+        }
+    }
+    taskEXIT_CRITICAL(&s_task_lock);
+
+    info->task_count = task_count;
+    info->heap_free_bytes = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+    info->heap_minimum_free_bytes = heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT);
+    return MICRO_OS_OK;
 }
 
 uint64_t micro_os_uptime_ms(void)

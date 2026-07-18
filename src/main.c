@@ -6,6 +6,7 @@
 #include "micro_os.h"
 #include "network_service.h"
 #include "terminal_service.h"
+#include "telnet_service.h"
 
 static const char *const TAG = "app";
 
@@ -68,6 +69,11 @@ void app_main(void)
 
 	if (terminal_service_start() != MICRO_OS_OK) {
 		ESP_LOGE(TAG, "Cannot start terminal service");
+		return;
+	}
+
+	if (telnet_service_start() != MICRO_OS_OK) {
+		ESP_LOGE(TAG, "Cannot start Telnet service");
 		return;
 	}
 

@@ -36,11 +36,22 @@ typedef struct {
     const char *name;
     uint8_t priority;
     uint32_t stack_free_bytes;
+    bool suspended;
 } micro_os_task_info_t;
+
+typedef struct {
+    uint16_t task_count;
+    size_t heap_free_bytes;
+    size_t heap_minimum_free_bytes;
+} micro_os_system_info_t;
 
 micro_os_status_t micro_os_init(void);
 micro_os_status_t micro_os_task_create(const micro_os_task_config_t *config, micro_os_task_id_t *task_id);
 micro_os_status_t micro_os_task_get_info(micro_os_task_id_t task_id, micro_os_task_info_t *info);
+micro_os_status_t micro_os_task_set_priority(micro_os_task_id_t task_id, uint8_t priority);
+micro_os_status_t micro_os_task_suspend(micro_os_task_id_t task_id);
+micro_os_status_t micro_os_task_resume(micro_os_task_id_t task_id);
+micro_os_status_t micro_os_get_system_info(micro_os_system_info_t *info);
 
 uint64_t micro_os_uptime_ms(void);
 void micro_os_sleep_ms(uint32_t duration_ms);
