@@ -7,10 +7,29 @@
 #include "esp_netif.h"
 #include "esp_wifi.h"
 #include "network_config.h"
+#include "nvs_flash.h"
 
 static const char *const TAG = "network";
 static bool s_connected;
 static char s_ip_address[16] = "0.0.0.0";
+
+static micro_os_status_t network_initialize_nvs(void)
+{
+    esp_err_t result = nvs_flash_init();
+    if (result == ESP_ERR_NVS_NO_FREE_PAGES || result == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_LOGW(TAG, "Erasing incompatible NVS partition");
+        result = nvs_flash_erase();
+        if (result == ESP_OK) {
+            result = nvs_flash_init();
+        }
+    }
+
+    if (result != ESP_OK) {
+        ESP_LOGE(TAG, "NVS initialization failed: %s", esp_err_to_name(result));
+        return MICRO_OS_ERROR_STATE;
+    }
+    return MICRO_OS_OK;
+}
 
 static void network_event_handler(void *argument, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -41,6 +60,10 @@ micro_os_status_t network_service_start(void)
         strcmp(NETWORK_WIFI_PASSWORD, "YOUR_WIFI_PASSWORD") == 0) {
         ESP_LOGW(TAG, "Wi-Fi disabled: set NETWORK_WIFI_SSID and NETWORK_WIFI_PASSWORD in network_config.h");
         return MICRO_OS_OK;
+    }
+
+    if (network_initialize_nvs() != MICRO_OS_OK) {
+        return MICRO_OS_ERROR_STATE;
     }
 
     ESP_ERROR_CHECK(esp_netif_init());

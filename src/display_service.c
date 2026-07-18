@@ -10,8 +10,8 @@
 #include "esp_lcd_panel_vendor.h"
 #include "esp_log.h"
 
-#define DISPLAY_WIDTH 240
-#define DISPLAY_HEIGHT 280
+#define DISPLAY_WIDTH 280
+#define DISPLAY_HEIGHT 240
 #define DISPLAY_SPI_CLOCK_HZ (40 * 1000 * 1000)
 #define DISPLAY_QUEUE_LENGTH 4
 #define DISPLAY_BACKGROUND 0x0841
