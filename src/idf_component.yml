@@ -1,3 +1,5 @@
 dependencies:
+  wolfssl/wolfssl:
+    version: "*"
   wolfssl/wolfssh:
     version: "*"
