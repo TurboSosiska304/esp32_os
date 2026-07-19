@@ -1,0 +1,155 @@
+Появилась новая проблема: Executing task: C:\Users\nikita\.platformio\penv\Scripts\platformio.exe device monitor 
+
+--- Terminal on COM5 | 115200 8-N-1
+--- Available filters and text transformations: debug, default, direct, esp32_exception_decoder, hexlify, log2file, nocontrol, printable, send_on_enter, time
+--- More details at https://bit.ly/pio-monitor-filters
+--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x14f0
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2f58
+entry 0x403c8900
+I (24) boot: ESP-IDF 6.0.1 2nd stage bootloader
+I (25) boot: compile time Jul 19 2026 10:19:44
+I (25) boot: Multicore bootloader
+I (25) boot: chip revision: v0.2
+I (28) boot: efuse block revision: v1.3
+I (31) boot.esp32s3: Boot SPI Speed : 80MHz
+I (35) boot.esp32s3: SPI Mode       : DIO
+I (39) boot.esp32s3: SPI Flash Size : 8MB
+I (43) boot: Enabling RNG early entropy source...
+I (47) boot: Partition Table:
+I (50) boot: ## Label            Usage          Type ST Offset   Length
+I (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (69) boot:  2 factory          factory app      00 00 00010000 00100000
+I (76) boot: End of partition table
+I (79) esp_image: segment 0: paddr=00010020 vaddr=3c0a0020 size=1e4a4h (124068) map
+I (108) esp_image: segment 1: paddr=0002e4cc vaddr=3fc9a400 size=01b4ch (  6988) load
+I (110) esp_image: segment 2: paddr=00030020 vaddr=42000020 size=90634h (591412) map
+I (218) esp_image: segment 3: paddr=000c065c vaddr=3fc9bf4c size=03750h ( 14160) load
+I (222) esp_image: segment 4: paddr=000c3db4 vaddr=40374000 size=16384h ( 91012) load
+I (242) esp_image: segment 5: paddr=000da140 vaddr=50000000 size=00024h (    36) load
+I (252) boot: Loaded app from partition at offset 0x10000
+I (252) boot: Disabling RNG early entropy source...
+I (262) cpu_start: Multicore app
+I (271) cpu_start: GPIO 44 and 43 are used as console UART I/O pins
+I (272) cpu_start: Pro cpu start user code
+I (272) cpu_start: cpu freq: 160000000 Hz
+I (273) app_init: Application information:
+I (277) app_init: Project name:     esp32_os
+I (281) app_init: App version:      4e63162-dirty
+I (285) app_init: Compile time:     Jul 19 2026 10:42:03
+I (290) app_init: ELF file SHA256:  1ebec6d5c...
+I (295) app_init: ESP-IDF:          6.0.1
+I (298) efuse_init: Min chip rev:     v0.0
+I (302) efuse_init: Max chip rev:     v0.99 
+I (306) efuse_init: Chip rev:         v0.2
+I (310) heap_init: Initializing. RAM available for dynamic allocation:
+I (316) heap_init: At 3FCA3820 len 00045EF0 (279 KiB): RAM
+I (322) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+I (327) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM
+I (332) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM
+I (338) spi_flash: detected chip: generic
+I (341) spi_flash: flash io: dio
+I (345) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (350) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (357) main_task: Started on CPU0
+I (387) main_task: Calling app_main()
+I (387) micro_os: Micro-OS 1.0.0 initialized
+I (507) micro_os: Task 1 (display) started
+I (507) display: ST7789V3 display service started (task 1)
+I (537) pp: pp rom version: e7ae62f
+I (547) net80211: net80211 rom version: e7ae62f
+I (557) wifi:wifi driver task: 3fcaa350, prio:23, stack:6656, core=0
+I (567) wifi:wifi firmware version: b37c951
+I (567) wifi:wifi certification version: v7.0
+I (567) wifi:config NVS flash: enabled
+I (567) wifi:config nano formatting: disabled
+I (567) wifi:Init data frame dynamic rx buffer num: 32
+I (577) wifi:Init static rx mgmt buffer num: 5
+I (577) wifi:Init management short buffer num: 32
+I (587) wifi:Init dynamic tx buffer num: 32
+I (587) wifi:Init static tx FG buffer num: 2
+I (587) wifi:Init static rx buffer size: 1600
+I (597) wifi:Init static rx buffer num: 10
+I (597) wifi:Init dynamic rx buffer num: 32
+I (607) wifi_init: rx ba win: 6
+I (607) wifi_init: accept mbox: 6
+I (607) wifi_init: tcpip mbox: 32
+I (617) wifi_init: udp mbox: 6
+I (617) wifi_init: tcp mbox: 6
+I (617) wifi_init: tcp tx win: 5760
+I (617) wifi_init: tcp rx win: 5760
+I (627) wifi_init: tcp mss: 1440
+I (627) wifi_init: WiFi IRAM OP enabled
+I (627) wifi_init: WiFi RX IRAM OP enabled
+I (637) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10
+I (687) wifi:mode : sta (34:cd:b0:33:8a:f0)
+I (687) wifi:enable tsf
+I (687) network: Connecting to configured Wi-Fi network
+
+Micro-OS terminal
+Type 'help' for commands.
+mos> I (687) micro_os: Task 2 (terminal) started
+I (697) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+I (697) wifi:state: init -> auth (0xb0)
+I (707) terminal: USB serial terminal started (task 2)
+I (747) micro_os: Task 3 (telnet) started
+I (747) telnet: Telnet service started (task 3)
+I (787) micro_os: Task 4 (heartbeat) started
+I (787) app: Event 0 at 446 ms
+I (1007) micro_os: Task 5 (monitor) started
+I (1007) app: Application services started: heartbeat=4 monitor=5
+I (1007) main_task: Returned from app_main()
+I (1277) wifi:state: auth -> assoc (0x0)
+I (1277) wifi:Association refused temporarily time 1000, comeback time 1100 (TUs)
+I (1787) app: Event 1 at 1445 ms
+I (2407) wifi:state: assoc -> auth (0xb0)
+I (2787) app: Event 2 at 2450 ms
+I (2977) wifi:state: auth -> assoc (0x0)
+I (3157) wifi:state: assoc -> run (0x10)
+I (3177) wifi:connected with OpenWrt_2.4, aid = 3, channel 1, BW20, bssid = 80:af:ca:d7:dd:56
+I (3177) wifi:security: WPA3-SAE H2E, phy: bgn, rssi: -27, cipher(pairwise:0x3, group:0x3), pmf:1
+I (3187) wifi:pm start, type: 1
+
+I (3187) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+I (3197) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+I (3207) wifi:dp: 2, bi: 102400, li: 4, scale listen interval from 307200 us to 409600 us
+I (3207) wifi:AP's beacon interval = 102400 us, DTIM period = 2
+I (3787) app: Event 3 at 3445 ms
+I (4727) esp_netif_handlers: sta ip: 10.10.10.248, mask: 255.255.255.0, gw: 10.10.10.1
+I (4727) network: Connected to OpenWrt_2.4; IP: 10.10.10.248
+I (4747) telnet: Telnet shell listening on TCP port 23
+I (4787) app: Event 4 at 4445 ms
+W (4787) app: Display event queue is full
+I (5787) app: Event 5 at 5445 ms
+W (5787) app: Display event queue is full
+I (6787) app: Event 6 at 6445 ms
+W (6787) app: Display event queue is full
+I (7787) app: Event 7 at 7445 ms
+W (7787) app: Display event queue is full
+I (8787) app: Event 8 at 8445 ms
+W (8787) app: Display event queue is full
+I (8947) wifi:<ba-add>idx:0 (ifx:0, 80:af:ca:d7:dd:56), tid:0, ssn:0, winSize:64
+I (9787) app: Event 9 at 9445 ms
+W (9787) app: Display event queue is full
+I (10787) app: Event 10 at 10445 ms
+W (10787) app: Display event queue is full
+I (11787) app: Event 11 at 11445 ms
+W (11787) app: Display event queue is full
+I (12787) app: Event 12 at 12445 ms
+W (12787) app: Display event queue is full
+I (13787) app: Event 13 at 13445 ms
+W (13787) app: Display event queue is full
+I (14787) app: Event 14 at 14445 ms
+W (14787) app: Display event queue is full
+I (15787) app: Event 15 at 15445 ms
+W (15787) app: Display event queue is full
+I (16787) app: Event 16 at 16445 ms
+W (16787) app: Display event queue is full
+I (17787) app: Event 17 at 17445 ms а также давай полностью уберём доступ по uart, оставим только телнет. Также добавим в микро ос инициализацию psram и rom
