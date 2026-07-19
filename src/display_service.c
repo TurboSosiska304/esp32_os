@@ -18,6 +18,7 @@
 #define DISPLAY_FOREGROUND 0xFFFF
 #define DISPLAY_ACCENT 0x07E0
 #define DISPLAY_WARNING 0xFD20
+#define DISPLAY_DIM 0x7BEF
 
 typedef struct {
     uint32_t sequence;
@@ -35,6 +36,20 @@ static const uint8_t DIGITS[10][5] = {
     {0x0C, 0x0A, 0x09, 0x3F, 0x08}, {0x17, 0x25, 0x25, 0x25, 0x19},
     {0x1E, 0x25, 0x25, 0x25, 0x18}, {0x01, 0x39, 0x05, 0x03, 0x01},
     {0x1A, 0x25, 0x25, 0x25, 0x1A}, {0x06, 0x29, 0x29, 0x29, 0x1E},
+};
+
+static const uint8_t LETTERS[][5] = {
+    {0x3F, 0x02, 0x04, 0x02, 0x3F}, /* M */
+    {0x00, 0x21, 0x3F, 0x21, 0x00}, /* I */
+    {0x1E, 0x21, 0x21, 0x21, 0x12}, /* C */
+    {0x3F, 0x09, 0x19, 0x29, 0x06}, /* R */
+    {0x1E, 0x21, 0x21, 0x21, 0x1E}, /* O */
+    {0x12, 0x25, 0x25, 0x25, 0x18}, /* S */
+    {0x3F, 0x05, 0x09, 0x11, 0x3F}, /* N */
+    {0x3F, 0x25, 0x25, 0x25, 0x1A}, /* B */
+    {0x3F, 0x05, 0x05, 0x05, 0x02}, /* T */
+    {0x3F, 0x25, 0x25, 0x25, 0x21}, /* E */
+    {0x3F, 0x01, 0x01, 0x01, 0x01}, /* L */
 };
 
 static void display_rectangle(int x, int y, int width, int height, uint16_t color)
@@ -79,6 +94,57 @@ static void display_number(int x, int y, uint32_t value, uint8_t scale, uint16_t
     }
 }
 
+static int display_letter_index(char character)
+{
+    switch (character) {
+    case 'M': return 0;
+    case 'I': return 1;
+    case 'C': return 2;
+    case 'R': return 3;
+    case 'O': return 4;
+    case 'S': return 5;
+    case 'N': return 6;
+    case 'B': return 7;
+    case 'T': return 8;
+    case 'E': return 9;
+    case 'L': return 10;
+    default: return -1;
+    }
+}
+
+static void display_text(int x, int y, const char *text, uint8_t scale, uint16_t color)
+{
+    for (size_t offset = 0; text[offset] != '\0'; ++offset) {
+        const char character = text[offset];
+        const int glyph = display_letter_index(character);
+        if (glyph >= 0) {
+            for (int column = 0; column < 5; ++column) {
+                for (int row = 0; row < 7; ++row) {
+                    if ((LETTERS[glyph][column] & (1U << row)) != 0U) {
+                        display_rectangle(x + (int)(offset * 6U * scale) + column * scale,
+                                          y + row * scale, scale, scale, color);
+                    }
+                }
+            }
+        }
+    }
+}
+
+static void display_boot_screen(void)
+{
+    display_fill(DISPLAY_BACKGROUND);
+    display_rectangle(0, 0, DISPLAY_WIDTH, 10, DISPLAY_ACCENT);
+    display_rectangle(0, DISPLAY_HEIGHT - 10, DISPLAY_WIDTH, 10, DISPLAY_ACCENT);
+    display_rectangle(24, 40, 232, 2, DISPLAY_DIM);
+    display_text(43, 62, "MICRO OS", 5, DISPLAY_FOREGROUND);
+    display_text(58, 132, "BOOTING", 3, DISPLAY_ACCENT);
+    display_digit(93, 172, 1, 5, DISPLAY_WARNING);
+    display_rectangle(126, 197, 9, 9, DISPLAY_WARNING);
+    display_digit(146, 172, 0, 5, DISPLAY_WARNING);
+    display_rectangle(179, 197, 9, 9, DISPLAY_WARNING);
+    display_digit(199, 172, 0, 5, DISPLAY_WARNING);
+}
+
 static void display_draw_dashboard(uint32_t sequence, uint64_t uptime_ms)
 {
     display_fill(DISPLAY_BACKGROUND);
@@ -93,6 +159,8 @@ static void display_draw_dashboard(uint32_t sequence, uint64_t uptime_ms)
 static void display_task(void *argument)
 {
     micro_os_queue_t *events = argument;
+    display_boot_screen();
+    micro_os_sleep_ms(1500);
     display_draw_dashboard(0, 0);
 
     for (;;) {

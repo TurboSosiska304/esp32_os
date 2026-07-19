@@ -4,8 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/** The initial version of the ESP32-S3 microkernel API. */
-#define MICRO_OS_VERSION "0.1.0"
+/** Stable first major release of the ESP32-S3 microkernel API. */
+#define MICRO_OS_VERSION "1.0.0"
 #define MICRO_OS_WAIT_FOREVER UINT32_MAX
 
 typedef enum {
