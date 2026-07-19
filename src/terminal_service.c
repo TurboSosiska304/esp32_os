@@ -2,12 +2,10 @@
 
 #include <stdio.h>
 
-#include "driver/uart.h"
 #include "esp_log.h"
 #include "shell.h"
 
 #define TERMINAL_LINE_LENGTH 96
-#define TERMINAL_UART UART_NUM_0
 
 static const char *const TAG = "terminal";
 
@@ -28,23 +26,23 @@ static void terminal_task(void *argument)
     shell_print_banner(&session);
     terminal_write(NULL, "mos> ");
     for (;;) {
-        uint8_t character;
-        const int received = uart_read_bytes(TERMINAL_UART, &character, 1, pdMS_TO_TICKS(20));
-        if (received == 1) {
-            if (character == '\r' || character == '\n') {
-                if (line_length == 0U) {
-                    continue;
-                }
-                line[line_length] = '\0';
-                terminal_write(NULL, "\r\n");
-                shell_execute_line(&session, line);
-                line_length = 0;
-                terminal_write(NULL, "mos> ");
-            } else if ((character == '\b' || character == 127U) && line_length > 0U) {
-                --line_length;
-            } else if (character >= 32U && character < 127U && line_length < sizeof(line) - 1U) {
-                line[line_length++] = (char)character;
+        const int character = fgetc(stdin);
+        if (character == EOF) {
+            micro_os_sleep_ms(20);
+            continue;
+        }
+        if (character == '\r' || character == '\n') {
+            if (line_length == 0U) {
+                continue;
             }
+            line[line_length] = '\0';
+            shell_execute_line(&session, line);
+            line_length = 0;
+            terminal_write(NULL, "mos> ");
+        } else if ((character == '\b' || character == 127) && line_length > 0U) {
+            --line_length;
+        } else if (character >= 32 && character < 127 && line_length < sizeof(line) - 1U) {
+            line[line_length++] = (char)character;
         }
     }
 }

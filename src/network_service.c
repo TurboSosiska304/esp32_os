@@ -104,3 +104,18 @@ void network_service_get_ip(char *buffer, size_t buffer_size)
     }
     strlcpy(buffer, s_ip_address, buffer_size);
 }
+
+void network_service_get_mac(char *buffer, size_t buffer_size)
+{
+    if (buffer == NULL || buffer_size == 0U) {
+        return;
+    }
+
+    uint8_t mac[6] = {0};
+    if (esp_wifi_get_mac(WIFI_IF_STA, mac) != ESP_OK) {
+        strlcpy(buffer, "--:--:--:--:--:--", buffer_size);
+        return;
+    }
+    snprintf(buffer, buffer_size, "%02X:%02X:%02X:%02X:%02X:%02X",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+}
